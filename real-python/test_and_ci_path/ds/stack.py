@@ -7,3 +7,10 @@ class Stack:
 
     def push(self, item):
         self._storage.append(item)
+
+    def pop(self):
+        try:
+            result = self._storage.pop()
+        except IndexError:
+            result = None
+        return result
