@@ -1,5 +1,6 @@
 import math
 
+
 class Category:
     def __init__(self, name: str):
         self.name = name
@@ -17,7 +18,7 @@ class Category:
     def get_balance(self) -> int:
         return sum(entry["amount"] for entry in self.ledger)
 
-    def transfer(self, amount: float, destination: 'Category') -> bool:
+    def transfer(self, amount: float, destination: "Category") -> bool:
         w_successful = self.withdraw(amount, f"Transfer to {destination.name}")
         if not w_successful:
             return False
@@ -48,32 +49,32 @@ class Category:
 def create_spend_chart(categories: list[Category]) -> str:
     spent_per_category = [c.get_total_spent() for c in categories]
     total_spent = sum(spent_per_category)
-    percentages = [math.floor(s/total_spent*10)*10 for s in spent_per_category]
-    bar_char = 'o'
+    percentages = [math.floor(s / total_spent * 10) * 10 for s in spent_per_category]
+    bar_char = "o"
 
     chart_lines = ["Percentage spent by category"]
 
     # bars
     for y_value in range(100, -1, -10):
-        line = str(y_value).rjust(3,' ')+'| '
+        line = str(y_value).rjust(3, " ") + "| "
         for p in percentages:
-            line += f'{bar_char}  ' if p >= y_value else ' '*3
+            line += f"{bar_char}  " if p >= y_value else " " * 3
         chart_lines.append(line)
 
     # x axis
-    chart_lines.append(' '*4 + '-' * (len(categories)*3 + 1))
+    chart_lines.append(" " * 4 + "-" * (len(categories) * 3 + 1))
 
     # names
     names = [c.name.capitalize() for c in categories]
     max_len = max(len(n) for n in names)
 
     for i in range(max_len):
-        line = ' '*5
+        line = " " * 5
         for name in names:
             line += f"{name[i] if len(name) > i else ' '}  "
         chart_lines.append(line)
 
-    return '\n'.join(chart_lines)
+    return "\n".join(chart_lines)
 
 
 food = Category("Food")
@@ -98,4 +99,3 @@ auto.deposit(100)
 auto.withdraw(12)
 
 print(create_spend_chart([food, clothing, auto]))
-
