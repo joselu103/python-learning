@@ -1,38 +1,43 @@
-rod = list[int]
+from typing import List, Iterator, Tuple
 
-def hanoi_solver(n_disks: int):
-    # CREATE PUZZLE
-    first: rod = list(range(n_disks,0,-1))
-    second: rod = []
-    third: rod = []
+Rod = List[int]
+State = Tuple[Rod, Rod, Rod]
+Move = Tuple[int, int]
 
-    initial_state = [state_snapshot(first, second, third)]
-    movements = solve_hanoi(n_disks, first, second, third)
+def hanoi_solver(n_disks: int) -> str:
+    states = simulate_hanoi(n_disks)
+    return format_states(states)
 
-    states = initial_state + movements
-    return format_state(states)
+def simulate_hanoi(n_disks: int) -> List[State]:
+    rods: List[Rod] = [
+        list(range(n_disks, 0, -1)),
+        [],
+        []
+    ]
 
-def solve_hanoi(n_disks, starting: rod, middle: rod, goal: rod) -> list[list[rod]]:
-    states = []
-    if n_disks > 1:
-        middle_states = solve_hanoi(n_disks - 1, starting, goal, middle)
-        states += [[state[0], state[2], state[1]] for state in middle_states]
+    states: List[State] = [snapshot(rods)]
 
-    disk = starting.pop()
-    goal.append(disk)
-    states.append(state_snapshot(starting, middle, goal))
-    if n_disks > 1:
-        final_states = solve_hanoi(n_disks - 1, middle, starting, goal)
-        states += [[state[1], state[0], state[2]] for state in final_states]
+    for src, dst in hanoi_moves(n_disks, 0, 1, 2):
+        disk = rods[src].pop()
+        rods[dst].append(disk)
+        states.append(snapshot(rods))
+
     return states
 
-def state_snapshot(starting: rod, middle: rod, goal: rod) -> list[rod]:
-    return [list(starting), list(middle), list(goal)]
 
-def format_state(states: list[list[rod]]) -> str:
-    return '\n'.join([f'{line[0]} {line[1]} {line[2]}' for line in states])
+def hanoi_moves(n: int, src: int, aux: int, dst: int) -> Iterator[Move]:
+    if n == 0:
+        return
+    yield from hanoi_moves(n - 1, src, dst, aux)
+    yield src, dst
+    yield from hanoi_moves(n - 1, aux, src, dst)
+
+def snapshot(rods: List[Rod]) -> State:
+    return tuple(list(r) for r in rods)
+
+def format_states(states: List[State]) -> str:
+    return "\n".join(
+        f"{a} {b} {c}" for a, b, c in states
+    )
 
 print(hanoi_solver(3))
-
-print(hanoi_solver(2))
-
